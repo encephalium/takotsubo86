@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poulpe UI</title>
+  <style>
+    body {
+      margin: 0;
+      background: url('fond.jpg') no-repeat center center/cover;
+      overflow: hidden;
+    }
+    #poulpe {
+      position: absolute;
+      width: 200px;
+      height: auto;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      transition: all 0.6s ease;
+      z-index: 1000;
+    }
+    .ui-cube {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #ccc;
+      backdrop-filter: blur(3px);
+    }
+    #cube1 { top: 10%; left: 10%; }
+    #cube2 { top: 20%; right: 10%; }
+    #cube3 { bottom: 10%; left: 30%; }
+    #cube4 { bottom: 10%; right: 20%; }
+  </style>
+</head>
+<body>
+  <img id="poulpe" src="poulpe.png" alt="Poulpe" />
+
+  <div class="ui-cube" id="cube1"></div>
+  <div class="ui-cube" id="cube2"></div>
+  <div class="ui-cube" id="cube3"></div>
+  <div class="ui-cube" id="cube4"></div>
+
+  <script>
+    const poulpe = document.getElementById('poulpe');
+    let offsetX = 0;
+    let offsetY = 0;
+    let isDragging = false;
+
+    poulpe.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      poulpe.style.transition = 'none';
+      offsetX = e.clientX - poulpe.getBoundingClientRect().left;
+      offsetY = e.clientY - poulpe.getBoundingClientRect().top;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      poulpe.style.left = `${e.clientX - offsetX}px`;
+      poulpe.style.top = `${e.clientY - offsetY}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        // Reset to center
+        poulpe.style.transition = 'all 0.6s ease';
+        poulpe.style.left = '50%';
+        poulpe.style.top = '50%';
+        poulpe.style.transform = 'translate(-50%, -50%)';
+      }
+    });
+  </script>
+</body>
+</html>
