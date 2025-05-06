@@ -15,6 +15,17 @@
   mix-blend-mode: lighten;
   transform-origin: center;
 }
+#asciiRainCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50; /* Sous le poulpe, mais au-dessus du fond */
+  pointer-events: none;
+  mix-blend-mode: lighten;
+  opacity: 0.2;
+}
 
 @keyframes glitch-strip-flicker {
   0%   { transform: translateY(0) scale(1); opacity: 0.4; }
@@ -378,22 +389,22 @@
 
   // === Scènes ===
   const scenes = [
-    {
-      background: 'fond_wallpaper_different_perspective.png',
-      poulpe: 'TSUBO_bUtton.png',
-      miniPoulpe: 'TSUBO_bUtton.png'
-    },
-    {
-      background: 'fond_wallpaper_scene2.png',
-      poulpe: 'TSUBO_scene2.png',
-      miniPoulpe: 'TSUBO_scene2.png'
-    },
-    {
-      background: 'fond_wallpaper_scene3.png',
-      poulpe: 'TSUBO_scene3.png',
-      miniPoulpe: 'TSUBO_scene3.png'
-    }
-  ];
+  {
+    background: 'fond_wallpaper_different_perspective.png',
+    poulpe: 'TSUBO_bUtton.png',
+    miniPoulpe: 'TSUBO_bUtton.png'
+  },
+  {
+    background: 'fond_wallpaper_scene2.png',
+    poulpe: 'TSUBO_scene2.png',
+    miniPoulpe: 'TSUBO_scene2.png'
+  },
+  {
+    background: 'fond_tsubogyas.png',
+    poulpe: 'tsubo_thinking.png',
+    miniPoulpe: 'tsubo_thinking.png'
+  }
+];
 
   let currentScene = 0;
 
@@ -407,7 +418,44 @@
       document.body.style.background = `black url('${scene.background}') no-repeat center center`;
       document.body.style.backgroundSize = 'contain';
       document.getElementById("poulpe").src = scene.poulpe;
-      document.querySelectorAll(".mini-poulpe").forEach(p => p.src = scene.miniPoulpe);
+      
+      const miniContainer = document.getElementById("mini-poulpes");
+      
+miniContainer.innerHTML = ''; // On vide les mini poulpes
+
+if (scene.miniPoulpe !== 'tsubo_thinking.png') {
+  for (let i = 0; i < 86; i++) {
+    const mini = document.createElement("img");
+    mini.src = scene.miniPoulpe;
+    mini.classList.add("mini-poulpe");
+    const size = 40 + Math.random() * 40;
+    mini.style.width = `${size}px`;
+
+    let x, y, tries = 0;
+    do {
+      x = Math.random() * (window.innerWidth - size);
+      y = Math.random() * (window.innerHeight - 120 - size);
+      tries++;
+    } while (isOverlapping(x, y, size) && tries < 100);
+
+    mini.style.left = `${x}px`;
+    mini.style.top = `${y}px`;
+    mini.style.position = "absolute";
+    mini.style.transform = `rotate(${Math.random() * 360}deg)`;
+    mini.style.cursor = "grab";
+
+    if (i === 13) {
+      mini.style.cursor = "pointer";
+      mini.style.filter = "hue-rotate(70deg) saturate(1.2)";
+      mini.addEventListener("click", () => {
+        window.location.href = "secret.html";
+      });
+    }
+
+    miniContainer.appendChild(mini);
+  }
+}
+
       fade.style.opacity = 0;
     }, 400);
   }
@@ -559,6 +607,55 @@
       }, 2000);
     }
   });
+  const canvas = document.getElementById('asciiRainCanvas');
+const ctx = canvas.getContext('2d');
+
+const mots = [
+  'coeur', 'sens', 'sourire', 'solitude', 'poids', 'regard', 'parole',
+  '心', '感覚', '孤独', '微笑み', '言葉', '重さ', '視線'
+];
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const fontSize = 18;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
+
+ctx.font = `${fontSize}px monospace`;
+
+function drawAsciiRain() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = mots[Math.floor(Math.random() * mots.length)];
+    const x = i * fontSize;
+    const y = drops[i] * fontSize;
+
+    ctx.fillStyle = '#00ffaa';
+    ctx.fillText(text, x, y);
+
+    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+
+let rainInterval = null;
+
+function startAsciiRain() {
+  if (!rainInterval) {
+    rainInterval = setInterval(drawAsciiRain, 60);
+  }
+}
+
+function stopAsciiRain() {
+  clearInterval(rainInterval);
+  rainInterval = null;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
 </script>
+<canvas id="asciiRainCanvas"></canvas>
 </body>
 </html>
