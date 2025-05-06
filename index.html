@@ -15,18 +15,6 @@
   mix-blend-mode: lighten;
   transform-origin: center;
 }
-#asciiRainCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 50; /* Sous le poulpe, mais au-dessus du fond */
-  pointer-events: none;
-  mix-blend-mode: lighten;
-  opacity: 0.2;
-}
-
 @keyframes glitch-strip-flicker {
   0%   { transform: translateY(0) scale(1); opacity: 0.4; }
   30%  { transform: translateY(-8px) scale(1.05); opacity: 0.7; }
@@ -63,7 +51,7 @@
     }
     body {
       background: url('fond_wallpaper_different_perspective.png') no-repeat center center;
-      background-size: contain;
+      background-size: cover;
       padding: 0 0 120px 0;
       min-height: 100vh;
       position: relative;
@@ -124,10 +112,10 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 500px;
+      font-size:  18vw;
       font-family: 'Courier New', monospace;
       font-weight: 300;
-      color: lime;
+      color: rgba(174, 179, 219, 0.247);
       line-height: 1;
       opacity: 0;
       pointer-events: none;
@@ -152,15 +140,23 @@
       pointer-events: none;
     }
     .scene-btn::before {
-      left: 2px;
-      color: lime;
-      animation: glitch-before 0.2s infinite;
-    }
-    .scene-btn::after {
-      left: -2px;
-      color: lime;
-      animation: glitch-after 0.15s infinite;
-    }
+  left: 2px;
+  color: rgba(174, 179, 219, 0.247); /* valeur initiale, sera override par l’animation */
+  animation: glitch-before 0.2s infinite, colorShift 1.2s infinite linear;
+}
+
+.scene-btn::after {
+  left: -2px;
+  color: rgba(174, 179, 219, 0.247); /* idem */
+  animation: glitch-after 0.15s infinite, colorShift 1s infinite linear;
+}
+@keyframes colorShift {
+  0%   { color: #00ffee; }
+  25%  { color: #ff00ff; }
+  50%  { color: #88faff; }
+  75%  { color: #ff4444; }
+  100% { color: #00ffee; }
+}
     @keyframes glitch-before {
       0% { clip-path: inset(10% 0 85% 0); }
       50% { clip-path: inset(30% 0 50% 0); }
@@ -228,28 +224,26 @@
       border: none;
       padding: 0;
     }
-
     .menu-node {
-      position: absolute;
-      left: 60px;
-      bottom: 400px;
-      opacity: 0;
-      transform: scale(0.5) translateY(0);
-      transition: all 0.4s ease;
-      background: black;
-      padding: 15px 20px;
-      font-size: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px #00000066;
-      width: 220px;
-      height: 60px;
-      color: white;
-      z-index: 1250;
-    }
-
+  position: absolute;
+  left: 1vw; /* position horizontale en % de largeur écran */
+  bottom: 35vh; /* position verticale en % de hauteur écran */
+  opacity: 0;
+  transform: scale(0.5) translateY(0);
+  transition: all 0.4s ease;
+  background: black;
+  padding: 2vh 3vw;
+  font-size: 1vw; /* taille texte dynamique */
+  border-radius: 1vw;
+  box-shadow: 0 0 1vw #00000066;
+  width: 7vw; /* largeur responsive */
+  height: 3vh;  /* hauteur responsive */
+  color: white;
+  z-index: 1250;
+}
     .menu-node.show {
       opacity: 1;
-      transform: scale(1) translateY(calc(var(--i) * -100px));
+      transform: scale(1) translateY(calc(var(--i) * -6vh)); /* avant c'était -100px */
     }
 
     #alert-tag {
@@ -269,6 +263,7 @@
       z-index: 1200;
       animation: blinkDanger 1s infinite alternate;
       white-space: nowrap;
+      display: none; /* caché par défaut */
     }
 
     @keyframes blinkDanger {
@@ -294,7 +289,7 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 120px;
+      height: 20px;
       background: black;
       z-index: 500;
     }
@@ -324,9 +319,10 @@
         padding: 4px 10px;
       }
       .menu-node {
-        font-size: 16px;
-        width: 180px;
-        height: 50px;
+  width: 24vw;
+  height: 5vh;
+  font-size: 3.5vw;
+  padding: 1.2vh 2vw;
       }
       #menuToggle {
         width: 80px;
@@ -347,9 +343,7 @@
   <div id="mini-poulpes"></div>
   <img id="menuToggle" src="animated_eye_cleaned_loop.gif" alt="Menu Eye" />
   <div class="menu-node" style="--i:0">Home</div>
-  <div class="menu-node" style="--i:1">Music</div>
   <div class="menu-node" style="--i:2">Gallery</div>
-  <div class="menu-node" style="--i:3">Videos</div>
   <div class="menu-node" style="--i:4">Contact</div>
   <div id="fade-layer"></div>
   <div id="bottom-bar"></div>
@@ -415,9 +409,40 @@
     setTimeout(() => {
       currentScene = (currentScene + dir + scenes.length) % scenes.length;
       const scene = scenes[currentScene];
-      document.body.style.background = `black url('${scene.background}') no-repeat center center`;
-      document.body.style.backgroundSize = 'contain';
+      // Gestion de l'affichage du player YouTube
+const ytContainer = document.getElementById("youtube-container");
+const ytButton = document.getElementById("yt-play-button");
+
+if (scene.poulpe === "TSUBO_bUtton.png") {
+  ytContainer.style.display = "block";
+  ytButton.style.display = "block";
+} else {
+  ytContainer.style.display = "none";
+  ytButton.style.display = "none";
+  if (ytPlayer && typeof ytPlayer.pauseVideo === "function") {
+    ytPlayer.pauseVideo();
+  }
+}
+
+      document.body.style.background = `url('${scene.background}') no-repeat center center`;
+      document.body.style.backgroundSize = 'cover';
       document.getElementById("poulpe").src = scene.poulpe;
+
+      const subtitle = document.getElementById("subtitle");
+if (scene.poulpe === "TSUBO_bUtton.png") {
+  subtitle.style.display = "block";
+} else {
+  subtitle.style.display = "none";
+}
+
+// Activation de l'effet ASCII uniquement sur tsubo_thinking
+if (scene.poulpe.includes("tsubo_thinking")) {
+  document.getElementById("asciiCanvas").style.display = "block";
+  startAsciiRain();
+} else {
+  document.getElementById("asciiCanvas").style.display = "none";
+  stopAsciiRain();
+}
       const youtube = document.getElementById("youtube-container");
 if (scene.poulpe === "TSUBO_bUtton.png") {
   youtube.style.display = "block";
@@ -429,6 +454,7 @@ if (scene.poulpe === "TSUBO_bUtton.png") {
 
 if (scene.poulpe.includes("tsubo_thinking")) {
   player.style.display = "block";
+  player.style.bottom = "50px";
   player.play().catch(e => {
     // auto-play bloqué, on laisse l’utilisateur cliquer
     console.log("Audio autoplay bloqué", e);
@@ -438,7 +464,12 @@ if (scene.poulpe.includes("tsubo_thinking")) {
   player.currentTime = 0;
   player.style.display = "none";
 }
- 
+const alertTag = document.getElementById("alert-tag");
+if (scene.poulpe.includes("tsubo_thinking")) {
+  alertTag.style.display = "block";
+} else {
+  alertTag.style.display = "none";
+}
 miniContainer.innerHTML = ''; // On vide les mini poulpes
 
 if (scene.miniPoulpe !== 'tsubo_thinking.png') {
@@ -625,62 +656,13 @@ if (scene.miniPoulpe !== 'tsubo_thinking.png') {
       }, 2000);
     }
   });
-  const canvas = document.getElementById('asciiRainCanvas');
-const ctx = canvas.getContext('2d');
-
-const mots = [
-  'coeur', 'sens', 'sourire', 'solitude', 'poids', 'regard', 'parole',
-  '心', '感覚', '孤独', '微笑み', '言葉', '重さ', '視線'
-];
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const fontSize = 18;
-const columns = Math.floor(canvas.width / fontSize);
-const drops = Array(columns).fill(1);
-
-ctx.font = `${fontSize}px monospace`;
-
-function drawAsciiRain() {
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = mots[Math.floor(Math.random() * mots.length)];
-    const x = i * fontSize;
-    const y = drops[i] * fontSize;
-
-    ctx.fillStyle = '#00ffaa';
-    ctx.fillText(text, x, y);
-
-    if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
-    drops[i]++;
-  }
-}
-
-let rainInterval = null;
-
-function startAsciiRain() {
-  if (!rainInterval) {
-    rainInterval = setInterval(drawAsciiRain, 60);
-  }
-}
-
-function stopAsciiRain() {
-  clearInterval(rainInterval);
-  rainInterval = null;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-window.addEventListener("load", () => transitionScene(0));
 </script>
-<canvas id="asciiRainCanvas"></canvas>
 <audio id="tsuboPlayer" controls style="position:fixed; bottom:150px; right:30px; z-index:3000; display:none;">
   <source src="m9_site.wav" type="audio/mpeg">
   <audio id="tsuboPlayer" src="SON_TSUBO.mp3" loop autoplay></audio>
   Votre navigateur ne supporte pas l'audio.
 </audio>
-<!-- Lecteur YouTube pour la scène principale -->
+<!-- Conteneur vidéo vide (l’API YouTube injectera l’iframe ici) -->
 <div id="youtube-container" style="
   position: fixed;
   top: 88%;
@@ -694,15 +676,135 @@ window.addEventListener("load", () => transitionScene(0));
   width: 280px;
   height: 158px;
   display: none;
+"></div>
+
+<!-- Bouton PLAY -->
+<button id="yt-play-button" style="
+  position: fixed;
+  top: 88%;
+  left: 80%;
+  transform: translate(-50%, -50%);
+  z-index: 2200;
+  background: black;
+  color: lime;
+  border: 2px solid lime;
+  padding: 10px 20px;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00ff00;
+  display: none;
 ">
-  <iframe id="youtube-frame"
-    width="280" height="158"
-    src="https://www.youtube.com/embed/C0nXqL9jrE0?autoplay=1&mute=1&controls=1&loop=1&playlist=C0nXqL9jrE0"
-    frameborder="0"
-    allow="autoplay; encrypted-media"
-    allowfullscreen>
-  </iframe>
-</div>
+  ▶ PLAY MODULE
+</button>
+
+<script>
+  let ytPlayer;
+  function onYouTubeIframeAPIReady() {
+    ytPlayer = new YT.Player('youtube-container', {
+      height: '158',
+      width: '280',
+      videoId: 'C0nXqL9jrE0',
+      playerVars: {
+        autoplay: 0,
+        controls: 1,
+        rel: 0,
+        loop: 1,
+        playlist: 'C0nXqL9jrE0'
+      },
+      events: {
+        'onReady': function () {
+          document.getElementById("yt-play-button").style.display = "block";
+        }
+      }
+    });
+  }
+
+  document.getElementById("yt-play-button").addEventListener("click", function () {
+    this.style.display = "none";
+    if (ytPlayer) {
+      ytPlayer.playVideo();
+    }
+  });
+
+  const tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+</script>
+<canvas id="asciiCanvas" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 60;
+  pointer-events: none;
+  background: transparent;
+"></canvas>
+<script>
+  const canvas = document.getElementById("asciiCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const jpWords = ["こころ", "ためいき", "しずか", "さがして", "ずれ", "ひかり", "こえ", "ゆっくり", "かげ"];
+  const frWords = ["coeur", "vide", "douceur", "fragile", "voix", "ombre", "retour", "absence", "lentement"];
+  const allWords = [...jpWords, ...frWords];
+  const fontSize = 22;
+  const columns = Math.floor(canvas.width / fontSize);
+  let drops = Array(columns).fill(1);
+  ctx.font = `${fontSize}px 'Source Code Pro', monospace`;
+
+  // 💙 Ici tu ajoutes la palette :
+  const palette = [
+    "#0D1B2A",  // bleu nuit profond
+    "#1B263B",  // bleu acier
+    "#415A77",  // bleu-gris
+    "#5A4E7C",  // mauve désaturé
+    "#6D597A",  // mauve-gris
+    "#8D6BB0",  // mauve plus vif
+    "#A26DD8"   // mauve électrique léger
+  ];
+
+  let asciiInterval;
+
+  function drawRain() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = allWords[Math.floor(Math.random() * allWords.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      // 1% clignote en rouge
+      if (Math.random() < 0.01) {
+        ctx.fillStyle = Math.random() < 0.5 ? "red" : "#FF0033";
+      } else {
+        ctx.fillStyle = palette[Math.floor(Math.random() * palette.length)];
+      }
+
+      ctx.fillText(text, x, y);
+
+      if (y > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  function startAsciiRain() {
+    drops = Array(columns).fill(1);
+    canvas.style.display = "block";
+    asciiInterval = setInterval(drawRain, 60);
+  }
+
+  function stopAsciiRain() {
+    clearInterval(asciiInterval);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.style.display = "none";
+  }
+</script>  
 </body>
 </html>
-
