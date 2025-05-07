@@ -432,7 +432,25 @@ body {
     max-width: 94vw;
   }
 }
-
+#audioWrapper[style*="display: none"] {
+  pointer-events: none;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+#audioWrapper[style*="display: none"] audio {
+  display: none !important;
+}
+.hide-audio {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  display: none !important;
+}
   </style>
 </head>
 <body>
@@ -543,6 +561,7 @@ if (scene.poulpe === "TSUBO_bUtton.png") {
 const playerWrapper = document.getElementById("audioWrapper");
 
 if (scene.poulpe.includes("tsubo_thinking")) {
+  playerWrapper.classList.remove("hide-audio");
   playerWrapper.style.display = "block";
   player.play().catch(e => {
     console.log("Autoplay bloqué", e);
@@ -550,7 +569,7 @@ if (scene.poulpe.includes("tsubo_thinking")) {
 } else {
   player.pause();
   player.currentTime = 0;
-  playerWrapper.style.display = "none";
+  playerWrapper.classList.add("hide-audio");
 }
 
 }
@@ -585,6 +604,7 @@ if (scene.poulpe === "TSUBO_bUtton.png") {
 const playerWrapper = document.getElementById("audioWrapper");
 
 if (scene.poulpe.includes("tsubo_thinking")) {
+  playerWrapper.classList.remove("hide-audio");
   player.style.display = "block";
   player.style.bottom = "50px";
   player.play().catch(e => {
