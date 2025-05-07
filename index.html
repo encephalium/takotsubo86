@@ -5,7 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TAKOTSUBO86</title>
   <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@200;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
+
   <style>
+
+#title-glitch {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8vw;
+  color: #00ffee;
+  display: flex;
+  gap: 0.2vw;
+  z-index: 3000;
+  animation: glitchFlicker 1.6s infinite alternate;
+}
+
+#title-glitch span {
+  transition: all 0.3s ease;
+  color: #00ffee; /* couleur de départ si tu veux */
+  text-shadow:
+  1px 1px 0 #111,     /* ombre fine */
+  2px 2px 1px #222,   /* profondeur */
+  3px 3px 2px rgba(0,0,0,0.5);  /* flou doux */
+  transform: rotate3d(1, 1, 0, 15deg);
+  filter: drop-shadow(2px 2px 1px #000000aa);
+}
+
+.orbit { font-family: 'Orbitron', sans-serif; }
+.press { font-family: 'Press Start 2P', monospace; }
+.zcool { font-family: 'ZCOOL KuaiLe', cursive; }
+.mono  { font-family: 'Major Mono Display', monospace; }
+
+@keyframes glitchFlicker {
+  0%   { opacity: 1; transform: translateX(-50%) scale(1); }
+  49%  { opacity: 0.92; transform: translateX(-49%) rotate(0.3deg); }
+  50%  { opacity: 0.75; transform: translateX(-51%) skewX(1deg); }
+  51%  { opacity: 0.6; transform: translateX(-50%) scale(0.98) skewX(-1deg); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
     .glitch-strip {
   position: absolute;
   z-index: 1400;
@@ -70,23 +112,6 @@ body {
     }
     #left-bar { left: 0; }
     #right-bar { right: 0; }
-    header {
-      position: fixed;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'Courier New', monospace;
-      font-size: 80px;
-      font-weight: bold;
-      color: lime;
-      text-shadow: 0 0 2px #00ff00, 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00;
-      animation: glowFlicker 1.2s infinite alternate;
-      z-index: 3000;
-    }
-    @keyframes glowFlicker {
-      0% { text-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00, 0 0 6px #00ff00; opacity: 0.95; }
-      100% { text-shadow: 0 0 4px #00ff00, 0 0 8px #00ff00, 0 0 14px #00ff00; opacity: 1; }
-    }
     #subtitle {
   position: absolute;
   top: 10vh;
@@ -299,6 +324,13 @@ body {
       background: black;
       z-index: 500;
     }
+    @media screen and (min-width: 1400px) {
+  #title-glitch {
+    top: 40px;
+    font-size: 2vw; /* plus petit si besoin */
+    transform: translateX(-50%) translateY(0);
+  }
+}
 
     /* Responsive styles (déjà vus précédemment) */
     @media screen and (max-width: 768px) {
@@ -404,7 +436,20 @@ body {
   </style>
 </head>
 <body>
-  <header>TAKOTSUBO86</header>
+  <header id="title-glitch">
+    <span class="orbit">T</span>
+    <span class="press">A</span>
+    <span class="zcool">K</span>
+    <span class="mono">O</span>
+    <span class="orbit">T</span>
+    <span class="press">S</span>
+    <span class="zcool">U</span>
+    <span class="mono">B</span>
+    <span class="orbit">O</span>
+    <span class="press">8</span>
+    <span class="zcool">6</span>
+  </header>
+  
   <div id="alert-tag">[⚠ INCOMING MODULE]</div>
   <div id="subtitle">Project :<br>ヴォイドスタティック x タコツボ 86</div>
   <img id="poulpe" src="TSUBO_bUtton.png" alt="Poulpe" />
@@ -941,5 +986,60 @@ if (scene.miniPoulpe !== 'tsubo_thinking.png') {
 }
   audio.addEventListener("timeupdate", updateSubtitle);
 </script>
+<script>
+  const letters = document.querySelectorAll("#title-glitch span");
+  
+  const colors = [
+    "#FFFFFF", // blanc
+    "#00FFFF", // bleu néon
+    "#88faff", // bleu ciel
+    "#FF00FF", // pourpre
+    "#DDA0DD", // violet
+    "#BA55D3", // mauve
+    "#00FF00", // vert
+    "#FFFF00", // jaune
+    "#FFA500", // orange
+    "#FF0000", // rouge
+    "#FF69B4", // rose
+    "#FFF700", // jaune canari
+  ];
+  
+  function randomDelay() {
+    // Loi de probabilité biaisée autour de 1.5s
+    const rand = Math.random();
+    if (rand < 0.6) return 1500 + Math.random() * 500;   // majorité autour de 1.5s à 2s
+    if (rand < 0.8) return 500 + Math.random() * 1000;   // courte
+    return 2000 + Math.random() * 6000;                  // longue
+  }
+  
+  function glitchLetter(letter) {
+    const original = letter.style.color;
+    const newColor = colors[Math.floor(Math.random() * colors.length)];
+  
+    // Petit glitch visuel rapide
+    letter.style.transition = "none";
+    letter.style.opacity = "0.3";
+    letter.style.transform = "scale(1.2) rotate(-2deg)";
+    
+    setTimeout(() => {
+      letter.style.color = newColor;
+      letter.style.opacity = "1";
+      letter.style.transform = "scale(1) rotate(0deg)";
+      letter.style.transition = "all 0.3s ease";
+    }, 80);
+  
+    setTimeout(() => {
+      glitchLetter(letter); // boucle infinie avec désynchro
+    }, randomDelay());
+  }
+  
+  // Démarre chaque lettre avec un léger décalage
+  letters.forEach((letter, i) => {
+    setTimeout(() => {
+      glitchLetter(letter);
+    }, Math.random() * 1000);
+  });
+  </script>
+  
 </body>
 </html>
